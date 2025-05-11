@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記事管理ダッシュボード</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script>
+    function showPage(page) {
+        document.getElementById('page-article').style.display = (page === 'article') ? 'block' : 'none';
+        document.getElementById('page-genre').style.display = (page === 'genre') ? 'block' : 'none';
+        document.getElementById('page-persona').style.display = (page === 'persona') ? 'block' : 'none';
+        document.querySelectorAll('.sidebar-menu li').forEach(function(li) {
+            li.classList.remove('active');
+        });
+        document.getElementById('menu-' + page).classList.add('active');
+        document.getElementById('breadcrumb-title').textContent =
+            (page === 'article') ? '記事一覧' :
+            (page === 'genre') ? '記事ジャンル集計' :
+            'ペルソナ・カスタマージャーニー生成';
+    }
+    window.onload = function() {
+        showPage('article');
+    }
+    // ペルソナ画面のアップロードダミー
+    function showPersonaTables() {
+        document.getElementById('persona-output').style.display = 'block';
+    }
+    </script>
+</head>
+<body>
+    <div class="topbar-warning">GSCの連携が切れています。再設定をお願いします。</div>
+    <div class="sidebar">
+        <img src="design/Logo.png" alt="Logo" class="sidebar-logo">
+        <ul class="sidebar-menu">
+            <li id="menu-article" class="active" onclick="showPage('article')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事一覧</li>
+            <li id="menu-genre" onclick="showPage('genre')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事ジャンル集計</li>
+            <li id="menu-persona" onclick="showPage('persona')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ・カスタマージャーニー生成</li>
+            <li><span class="icon"><img src="design/Icon.png" alt=""></span>ダッシュボード</li>
+            <li><span class="icon"><img src="design/Icon.png" alt=""></span>マスタ管理</li>
+            <li><span class="icon"><img src="design/Icon.png" alt=""></span>分析</li>
+            <li><span class="icon"><img src="design/Icon.png" alt=""></span>設定</li>
+        </ul>
+    </div>
+    <div class="main-area">
+        <header class="header">
+            <nav class="breadcrumbs">
+                <ul>
+                    <li><a href="#">ホーム</a></li>
+                    <li id="breadcrumb-title">記事一覧</li>
+                </ul>
+            </nav>
+            <div class="header-user">
+                <span class="user-name">user@example.com</span>
+                <button class="btn-help">?</button>
+            </div>
+        </header>
+        <main>
+            <div id="page-article" class="dashboard-page">
+                <div class="banner-area">
+                    <img src="design/Banner.png" alt="AIライティングバナー" style="width:100%;max-width:600px;display:block;margin:0 auto 16px auto;">
+                </div>
+                <div class="tab-bar">
+                    <button class="tab active">PC</button>
+                    <button class="tab">スマホ</button>
+                </div>
+                <div class="filter-bar">
+                    <button class="btn-green">＋ キーワード登録</button>
+                    <span class="filter-info">すべてのキーワード成果 <b>234</b> / 1000</span>
+                    <input type="text" class="input-search" placeholder="検索...">
+                    <input type="date" class="input-date">
+                    <input type="date" class="input-date">
+                </div>
+                <div class="data-table article-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>公開月</th>
+                                <th>ランディングページ</th>
+                                <th>ページタイトル</th>
+                                <th>対策KW</th>
+                                <th>検索Vol</th>
+                                <th>担当</th>
+                                <th>カテゴリ大</th>
+                                <th>カテゴリ小</th>
+                                <th>サブカテゴリ</th>
+                                <th>遷移先(今あるもので)</th>
+                                <th>遷移先(理想)</th>
+                                <th>CJMフェーズ</th>
+                                <th>親トピック</th>
+                                <th>子トピック</th>
+                                <th>資料</th>
+                                <th>20220805</th>
+                                <th>KW難易度</th>
+                                <th>セッション</th>
+                                <th>オファーページ遷移数</th>
+                                <th>オファーページ遷移率</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/10071/" class="link-url">https://service.plan-b.co.jp/blog/seo/10071/</a></td><td>GoogleSearchConsole 検索アナリティクスの活用術｜こう見ればあなたも使いこなせる | PINTO! by PLAN-B</td><td>Google Search Console</td><td>40500</td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>11</td><td>1</td><td>9.09%</td></tr>
+                            <tr><td>20</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/11503/" class="link-url">https://service.plan-b.co.jp/blog/seo/11503/</a></td><td>アナリティクスのコンバージョン設定｜通常サイト・ECサイト・クロスドメイントラッキングも解説 | PINTO! by PLAN-B</td><td>クロスドメイントラッキング</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td>SW</td><td></td><td></td><td></td><td>455</td><td>31</td><td>6.81%</td></tr>
+                            <tr><td>21</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/11504/" class="link-url">https://service.plan-b.co.jp/blog/seo/11504/</a></td><td>GoogleアナリティクスのIP除外設定｜自分のアクセスを取得しないために必須 | PINTO! by PLAN-B</td><td>アナリティクス ip 除外</td><td>260</td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>1271</td><td>97</td><td>7.63%</td></tr>
+                            <tr><td>22</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/11505/" class="link-url">https://service.plan-b.co.jp/blog/seo/11505/</a></td><td>Googleアナリティクスイベントトラッキング｜設定方法から注意点・おすすめのプラグイン紹介 | PINTO! by PLAN-B</td><td>アナリティクス イベント 設定</td><td>90</td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td>SW</td><td></td><td></td><td></td><td>101</td><td>9</td><td>8.91%</td></tr>
+                            <tr><td>36</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12781/" class="link-url">https://service.plan-b.co.jp/blog/seo/12781/</a></td><td>Googleアナリティクスでの検索ワードチェック方法｜not providedの理由も解説 | PINTO! by PLAN-B</td><td>アナリティクス 検索ワード</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE※最適化CTA設置</td><td>SW</td><td></td><td></td><td></td><td>1666</td><td>106</td><td>6.36%</td></tr>
+                            <tr><td>37</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12792/" class="link-url">https://service.plan-b.co.jp/blog/seo/12792/</a></td><td>Googleアナリティクス資格一覧｜運用者なら取るべき？内容と業界の認知度などを紹介 | PINTO! by PLAN-B</td><td>googleアナリティクス 資格</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>666</td><td>57</td><td>8.56%</td></tr>
+                            <tr><td>38</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12837/" class="link-url">https://service.plan-b.co.jp/blog/seo/12837/</a></td><td>Googleアナリティクス カスタムディメンション｜おすすめの設定方法と運用の考え方について | PINTO! by PLAN-B</td><td>カスタムディメンション</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>22</td><td>1</td><td>4.55%</td></tr>
+                            <tr><td>39</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12847/" class="link-url">https://service.plan-b.co.jp/blog/seo/12847/</a></td><td>Googleアナリティクスの勉強方法一覧｜効率的な学習で最大の成果を出す | PINTO! by PLAN-B</td><td>Googleアナリティクス 勉強</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>221</td><td>18</td><td>8.14%</td></tr>
+                            <tr><td>47</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/13280/" class="link-url">https://service.plan-b.co.jp/blog/seo/13280/</a></td><td>Googleアナリティクスのレポート作成ツール｜無料で使えるレポート作成ツール一覧 | PINTO! by PLAN-B</td><td>アナリティクスレポート</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td></td><td></td><td></td><td>96</td><td>7</td><td>7.29%</td></tr>
+                            <tr><td>50</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/13519/" class="link-url">https://service.plan-b.co.jp/blog/seo/13519/</a></td><td>Googleアナリティクスゴールフロー設定｜便利な機能を覚えてマーケティングで活用しよう！ | PINTO! by PLAN-B</td><td></td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td>16</td><td></td><td>0.00%</td></tr>
+                            <tr><td>51</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/13520/" class="link-url">https://service.plan-b.co.jp/blog/seo/13520/</a></td><td>アシストコンバージョン｜レポートのチェック方法と運用の際の注意点を紹介します | PINTO! by PLAN-B</td><td>アシストコンバージョン</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td></td><td></td><td></td><td>98</td><td>10</td><td>10.20%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="page-genre" class="dashboard-page" style="display:none;">
+                <div class="card">
+                    <div class="section-title"><img src="design/Heading.png" alt="icon">記事ジャンル集計</div>
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>ジャンル名</th>
+                                    <th>記事本数</th>
+                                    <th>総検索Vol</th>
+                                    <th>セッション</th>
+                                    <th>オファー</th>
+                                    <th>オファー率</th>
+                                    <th>想定CV数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>SEO内部対策</td><td>73</td><td>14290</td><td>55011</td><td>3575</td><td>6.50%</td><td>357.5</td></tr>
+                                <tr><td>2</td><td>SEO外部対策</td><td>11</td><td>2180</td><td>3072</td><td>187</td><td>6.09%</td><td>18.7</td></tr>
+                                <tr><td>3</td><td>GAGSC</td><td>49</td><td>85980</td><td>13785</td><td>1012</td><td>7.34%</td><td>101.2</td></tr>
+                                <tr><td>4</td><td>コンテンツライティング</td><td>40</td><td>5010</td><td>7151</td><td>573</td><td>8.01%</td><td>57.3</td></tr>
+                                <tr><td>5</td><td>Google検索アルゴリズム</td><td>43</td><td>34400</td><td>4224</td><td>311</td><td>7.36%</td><td>31.1</td></tr>
+                                <tr><td>6</td><td>ツール紹介</td><td>16</td><td>71280</td><td>3859</td><td>321</td><td>8.32%</td><td>32.1</td></tr>
+                                <tr><td>7</td><td>お客様事例</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.00%</td><td>0</td></tr>
+                                <tr><td>8</td><td>割り振りなし</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.00%</td><td>0</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="page-persona" class="dashboard-page" style="display:none;">
+                <div class="card">
+                    <div class="section-title"><img src="design/Heading.png" alt="icon">素材アップロード</div>
+                    <input type="file" id="persona-file" style="margin-bottom:12px;">
+                    <button class="btn-green" onclick="showPersonaTables()">アップロード</button>
+                </div>
+                <div id="persona-output" style="display:none;">
+                    <div class="card">
+                        <div class="section-title"><img src="design/Heading.png" alt="icon">ペルソナ</div>
+                        <div class="data-table">
+                            <table>
+                                <thead><tr><th>属性</th><th>値</th></tr></thead>
+                                <tbody>
+                                    <tr><td>年齢</td><td>35歳</td></tr>
+                                    <tr><td>性別</td><td>女性</td></tr>
+                                    <tr><td>職業</td><td>マーケター</td></tr>
+                                    <tr><td>課題</td><td>SEO集客の強化</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="section-title"><img src="design/Heading.png" alt="icon">カスタマージャーニー</div>
+                        <div class="data-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>項目</th>
+                                        <th>潜在ニーズ</th>
+                                        <th>準顕在ニーズ</th>
+                                        <th>顕在ニーズ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ユーザーの悩みや課題</td>
+                                        <td>視線のにおいが気になる<br>気分転換できる商品があまりない<br>ルームフレグランスを試してみたい<br>プレゼント選びに迷う<br>車内の臭い対策</td>
+                                        <td>手軽に使える消臭・芳香アイテムが欲しい<br>目的の香りになかなか出会えない<br>持ち運びできる商品を探している<br>ギフトとしておしゃれなものを選びたい<br>まとめ買いアイテムを比較検討したい</td>
+                                        <td>Johns Blendの公式ストアから購入したい<br>ホームフレグランスをオンラインで注文したい<br>ギフトセットや限定商品を購入したい<br>限定アイテムを家族に入手したい<br>まとめ買い商品を購入したい</td>
+                                    </tr>
+                                    <tr>
+                                        <td>対策キーワード（検索キーワード）<br>※各列10個ずつ、合計30個</td>
+                                        <td>
+                                            <div class="kw-category">
+                                                <div class="kw-category-header">
+                                                    <span class="kw-category-title">【消臭系】</span>
+                                                    <span class="badge badge-done">記事作成率 60%</span>
+                                                    <span class="badge badge-top">上位表示率 40%</span>
+                                                </div>
+                                                <ul class="kw-list">
+                                                    <li>ルームフレグランス メリット <span class="badge badge-done">記事化済み</span> <span class="badge badge-top">上位表示</span></li>
+                                                    <li>ルームフレグランス おすすめ <span class="badge badge-todo">未作成</span></li>
+                                                    <li>ルームフレグランス 種類 違い <span class="badge badge-done">記事化済み</span></li>
+                                                    <li>ルームフレグランス 人気 <span class="badge badge-todo">未作成</span></li>
+                                                    <li>ルームフレグランス 消臭 方法 <span class="badge badge-done">記事化済み</span> <span class="badge badge-top">上位表示</span></li>
+                                                </ul>
+                                            </div>
+                                            <div class="kw-category">
+                                                <div class="kw-category-header">
+                                                    <span class="kw-category-title">【ギフト系】</span>
+                                                    <span class="badge badge-done">記事作成率 80%</span>
+                                                    <span class="badge badge-top">上位表示率 50%</span>
+                                                </div>
+                                                <ul class="kw-list">
+                                                    <li>ルームフレグランス プレゼント <span class="badge badge-done">記事化済み</span> <span class="badge badge-top">上位表示</span></li>
+                                                    <li>ルームフレグランス コーディネート <span class="badge badge-todo">未作成</span></li>
+                                                    <li>ルームフレグランス 使い方 <span class="badge badge-done">記事化済み</span></li>
+                                                    <li>ルームフレグランス 香り 持続 <span class="badge badge-done">記事化済み</span></li>
+                                                    <li>ルームフレグランス 購入 方法 <span class="badge badge-todo">未作成</span></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <ul class="kw-list">
+                                                <li>Johns Blend 購入 <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 公式ストア <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 商品ラインナップ <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend トライアルセット <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 限定商品 <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 販売 <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 取扱店 <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 口コミ <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend カート <span class="badge badge-todo">未作成</span></li>
+                                                <li>Johns Blend 通販 注文 <span class="badge badge-todo">未作成</span></li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>コンテンツの目的</td>
+                                        <td>香りの効果や楽しみ方を提案し興味喚起<br>ライフスタイル提案型の関心促進</td>
+                                        <td>商品ラインナップや特徴の紹介・検討を後押し<br>比較・レビューで検討材料の提供</td>
+                                        <td>購入意欲を明確化しコンバージョンを促進<br>キャンペーンや限定商品情報で後押し</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SEO以外で情報収集する可能性があるチャネル</td>
+                                        <td>Instagram・Pinterest（インテリアや香りの関連投稿）<br>生活情報系ブログ・雑誌の紙面</td>
+                                        <td>YouTubeのレビュー動画やインフルエンサーコンテンツ<br>フレグランスの比較サイトやまとめ記事<br>インフルエンサーのおすすめ投稿</td>
+                                        <td>Facebook・LINE公式・アカウントのセール通知<br>ギフトカタログや会員DM<br>Web広告（リターゲティング・交通広告）</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html> 
