@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>記事管理ダッシュボード</title>
+    <title>SEARCH WRITE風ダッシュボード</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -18,50 +18,134 @@
         });
         document.getElementById('menu-' + page).classList.add('active');
         document.getElementById('breadcrumb-title').textContent =
-            (page === 'article') ? '記事一覧' :
+            (page === 'article') ? '成果チェック' :
             (page === 'genre') ? '記事ジャンル集計' :
             'ペルソナ・カスタマージャーニー生成';
     }
     window.onload = function() {
         showPage('article');
+        renderArticleTable();
     }
-    // ペルソナ画面のアップロードダミー
     function showPersonaTables() {
         document.getElementById('persona-output').style.display = 'block';
+    }
+    // サンプルデータ（カテゴリごとに5記事ずつ）
+    const articleData = [
+      {
+        categoryLarge: 'SEO内部対策',
+        categorySmall: '成果観測',
+        articles: [
+          { no: 1, month: '2022-08', kw: 'Google Search Console', url: 'https://service.plan-b.co.jp/blog/seo/10071/', title: 'GSC 検索アナリティクス活用術', vol: 40500, tantou: 'GAGSC', subcategory: 'SEO', nextNow: 'A', nextIdeal: 'B', cjm: '認知', parent: 'GAGSC', child: 'A1', doc: '', d20220805: '', kwLevel: '中', session: 11, offerNum: 1, offerRate: '9.09%' },
+          { no: 2, month: '2022-09', kw: 'アナリティクス ip 除外', url: 'https://service.plan-b.co.jp/blog/seo/11504/', title: 'GA IP除外設定', vol: 260, tantou: 'GAGSC', subcategory: 'SEO', nextNow: 'B', nextIdeal: 'C', cjm: '興味', parent: 'GAGSC', child: 'A2', doc: '', d20220805: '', kwLevel: '低', session: 1271, offerNum: 97, offerRate: '7.63%' },
+          { no: 3, month: '2022-10', kw: 'カスタムディメンション', url: 'https://service.plan-b.co.jp/blog/seo/12837/', title: 'GA カスタムディメンション設定', vol: 90, tantou: 'GAGSC', subcategory: 'SEO', nextNow: 'C', nextIdeal: 'D', cjm: '比較', parent: 'GAGSC', child: 'A3', doc: '', d20220805: '', kwLevel: '高', session: 22, offerNum: 1, offerRate: '4.55%' },
+          { no: 4, month: '2022-11', kw: 'Googleアナリティクス 勉強', url: 'https://service.plan-b.co.jp/blog/seo/12847/', title: 'GA 効率的な学習法', vol: 150, tantou: 'GAGSC', subcategory: 'SEO', nextNow: 'D', nextIdeal: 'E', cjm: '検討', parent: 'GAGSC', child: 'A4', doc: '', d20220805: '', kwLevel: '中', session: 221, offerNum: 18, offerRate: '8.14%' },
+          { no: 5, month: '2022-12', kw: 'アナリティクスレポート', url: 'https://service.plan-b.co.jp/blog/seo/13280/', title: 'GA レポート作成ツール', vol: 300, tantou: 'GAGSC', subcategory: 'SEO', nextNow: 'E', nextIdeal: 'F', cjm: '購入', parent: 'GAGSC', child: 'A5', doc: '', d20220805: '', kwLevel: '低', session: 96, offerNum: 7, offerRate: '7.29%' }
+        ]
+      },
+      {
+        categoryLarge: 'SEO外部対策',
+        categorySmall: '成果観測',
+        articles: [
+          { no: 6, month: '2022-08', kw: 'クロスドメイントラッキング', url: 'https://service.plan-b.co.jp/blog/seo/11503/', title: 'クロスドメイントラッキング解説', vol: 500, tantou: 'GAGSC', subcategory: '外部', nextNow: 'A', nextIdeal: 'B', cjm: '認知', parent: 'SEARCH WRITE', child: 'B1', doc: '', d20220805: '', kwLevel: '中', session: 455, offerNum: 31, offerRate: '6.81%' },
+          { no: 7, month: '2022-09', kw: 'アナリティクス イベント 設定', url: 'https://service.plan-b.co.jp/blog/seo/11505/', title: 'GA イベントトラッキング設定', vol: 90, tantou: 'GAGSC', subcategory: '外部', nextNow: 'B', nextIdeal: 'C', cjm: '興味', parent: 'SEARCH WRITE', child: 'B2', doc: '', d20220805: '', kwLevel: '高', session: 101, offerNum: 9, offerRate: '8.91%' },
+          { no: 8, month: '2022-10', kw: '外部リンク獲得', url: 'https://service.plan-b.co.jp/blog/seo/20001/', title: '外部リンク獲得のコツ', vol: 120, tantou: 'GAGSC', subcategory: '外部', nextNow: 'C', nextIdeal: 'D', cjm: '比較', parent: 'SEARCH WRITE', child: 'B3', doc: '', d20220805: '', kwLevel: '低', session: 300, offerNum: 15, offerRate: '5.00%' },
+          { no: 9, month: '2022-11', kw: '被リンク分析', url: 'https://service.plan-b.co.jp/blog/seo/20002/', title: '被リンク分析の基本', vol: 80, tantou: 'GAGSC', subcategory: '外部', nextNow: 'D', nextIdeal: 'E', cjm: '検討', parent: 'SEARCH WRITE', child: 'B4', doc: '', d20220805: '', kwLevel: '中', session: 210, offerNum: 12, offerRate: '5.71%' },
+          { no: 10, month: '2022-12', kw: '外部SEOツール', url: 'https://service.plan-b.co.jp/blog/seo/20003/', title: '外部SEOツールまとめ', vol: 200, tantou: 'GAGSC', subcategory: '外部', nextNow: 'E', nextIdeal: 'F', cjm: '購入', parent: 'SEARCH WRITE', child: 'B5', doc: '', d20220805: '', kwLevel: '高', session: 180, offerNum: 10, offerRate: '5.56%' }
+        ]
+      },
+      {
+        categoryLarge: 'コンテンツライティング',
+        categorySmall: '成果観測',
+        articles: [
+          { no: 11, month: '2022-08', kw: 'SEO記事 書き方', url: 'https://service.plan-b.co.jp/blog/seo/30001/', title: 'SEO記事の書き方', vol: 800, tantou: 'GAGSC', subcategory: 'ライティング', nextNow: 'A', nextIdeal: 'B', cjm: '認知', parent: 'GAGSC', child: 'C1', doc: '', d20220805: '', kwLevel: '中', session: 600, offerNum: 40, offerRate: '6.67%' },
+          { no: 12, month: '2022-09', kw: '構成案 作り方', url: 'https://service.plan-b.co.jp/blog/seo/30002/', title: 'SEO構成案の作り方', vol: 350, tantou: 'GAGSC', subcategory: 'ライティング', nextNow: 'B', nextIdeal: 'C', cjm: '興味', parent: 'GAGSC', child: 'C2', doc: '', d20220805: '', kwLevel: '低', session: 400, offerNum: 25, offerRate: '6.25%' },
+          { no: 13, month: '2022-10', kw: 'リライト方法', url: 'https://service.plan-b.co.jp/blog/seo/30003/', title: 'SEOリライトの方法', vol: 220, tantou: 'GAGSC', subcategory: 'ライティング', nextNow: 'C', nextIdeal: 'D', cjm: '比較', parent: 'GAGSC', child: 'C3', doc: '', d20220805: '', kwLevel: '高', session: 350, offerNum: 20, offerRate: '5.71%' },
+          { no: 14, month: '2022-11', kw: '記事タイトル 付け方', url: 'https://service.plan-b.co.jp/blog/seo/30004/', title: 'SEO記事タイトルの付け方', vol: 180, tantou: 'GAGSC', subcategory: 'ライティング', nextNow: 'D', nextIdeal: 'E', cjm: '検討', parent: 'GAGSC', child: 'C4', doc: '', d20220805: '', kwLevel: '中', session: 320, offerNum: 18, offerRate: '5.63%' },
+          { no: 15, month: '2022-12', kw: '見出しタグ 最適化', url: 'https://service.plan-b.co.jp/blog/seo/30005/', title: '見出しタグの最適化', vol: 140, tantou: 'GAGSC', subcategory: 'ライティング', nextNow: 'E', nextIdeal: 'F', cjm: '購入', parent: 'GAGSC', child: 'C5', doc: '', d20220805: '', kwLevel: '低', session: 280, offerNum: 15, offerRate: '5.36%' }
+        ]
+      }
+    ];
+
+    function renderArticleTable() {
+      const tbody = document.getElementById('article-table-body');
+      tbody.innerHTML = '';
+      articleData.forEach((cat, idx) => {
+        // カテゴリトグル行
+        const trToggle = document.createElement('tr');
+        trToggle.className = 'category-toggle-row';
+        trToggle.innerHTML = `<td colspan="21"><button class="toggle-btn" onclick="toggleCategory(${idx})" id="toggle-btn-${idx}">▼</button> <b>${cat.categoryLarge} / ${cat.categorySmall}</b></td>`;
+        tbody.appendChild(trToggle);
+        // 記事行
+        cat.articles.forEach((a, aidx) => {
+          const tr = document.createElement('tr');
+          tr.className = `category-group category-group-${idx}`;
+          tr.innerHTML = `
+            <td>${a.no}</td>
+            <td>${a.month}</td>
+            <td>${cat.categoryLarge}</td>
+            <td>${cat.categorySmall}</td>
+            <td>${a.kw}</td>
+            <td><a href="${a.url}" class="link-url">${a.url}</a></td>
+            <td>${a.title}</td>
+            <td>${a.vol}</td>
+            <td>${a.tantou}</td>
+            <td>${a.subcategory}</td>
+            <td>${a.nextNow}</td>
+            <td>${a.nextIdeal}</td>
+            <td>${a.cjm}</td>
+            <td>${a.parent}</td>
+            <td>${a.child}</td>
+            <td>${a.doc}</td>
+            <td>${a.d20220805}</td>
+            <td>${a.kwLevel}</td>
+            <td>${a.session}</td>
+            <td>${a.offerNum}</td>
+            <td>${a.offerRate}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+    function toggleCategory(idx) {
+      const rows = document.querySelectorAll('.category-group-' + idx);
+      const btn = document.getElementById('toggle-btn-' + idx);
+      const isOpen = btn.textContent === '▼';
+      rows.forEach(row => {
+        row.style.display = isOpen ? 'none' : '';
+      });
+      btn.textContent = isOpen ? '▲' : '▼';
     }
     </script>
 </head>
 <body>
     <div class="topbar-warning">GSCの連携が切れています。再設定をお願いします。</div>
-    <div class="sidebar">
-        <img src="design/Logo.png" alt="Logo" class="sidebar-logo">
+    <aside class="sidebar sw-sidebar">
+        <div class="sidebar-logo-area">
+            <img src="design/Logo.png" alt="Logo" class="sidebar-logo">
+        </div>
         <ul class="sidebar-menu">
-            <li id="menu-article" class="active" onclick="showPage('article')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事一覧</li>
+            <li id="menu-article" class="active" onclick="showPage('article')"><span class="icon"><img src="design/Icon.png" alt=""></span>成果チェック</li>
             <li id="menu-genre" onclick="showPage('genre')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事ジャンル集計</li>
             <li id="menu-persona" onclick="showPage('persona')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ・カスタマージャーニー生成</li>
-            <li><span class="icon"><img src="design/Icon.png" alt=""></span>ダッシュボード</li>
-            <li><span class="icon"><img src="design/Icon.png" alt=""></span>マスタ管理</li>
-            <li><span class="icon"><img src="design/Icon.png" alt=""></span>分析</li>
-            <li><span class="icon"><img src="design/Icon.png" alt=""></span>設定</li>
         </ul>
-    </div>
+        <div class="sidebar-bottom">
+            <div class="sidebar-user">user@example.com</div>
+            <button class="btn-help">?</button>
+        </div>
+    </aside>
     <div class="main-area">
-        <header class="header">
+        <header class="header sw-header">
             <nav class="breadcrumbs">
                 <ul>
                     <li><a href="#">ホーム</a></li>
-                    <li id="breadcrumb-title">記事一覧</li>
+                    <li id="breadcrumb-title">成果チェック</li>
                 </ul>
             </nav>
-            <div class="header-user">
-                <span class="user-name">user@example.com</span>
-                <button class="btn-help">?</button>
-            </div>
         </header>
         <main>
             <div id="page-article" class="dashboard-page">
                 <div class="banner-area">
-                    <img src="design/Banner.png" alt="AIライティングバナー" style="width:100%;max-width:600px;display:block;margin:0 auto 16px auto;">
+                    <img src="design/Banner.png" alt="AIライティングバナー" style="width:100%;max-width:900px;display:block;margin:0 auto 16px auto;">
                 </div>
                 <div class="tab-bar">
                     <button class="tab active">PC</button>
@@ -80,13 +164,13 @@
                             <tr>
                                 <th>No</th>
                                 <th>公開月</th>
-                                <th>ランディングページ</th>
-                                <th>ページタイトル</th>
-                                <th>対策KW</th>
-                                <th>検索Vol</th>
-                                <th>担当</th>
                                 <th>カテゴリ大</th>
                                 <th>カテゴリ小</th>
+                                <th>対策KW</th>
+                                <th>ランディングページ</th>
+                                <th>ページタイトル</th>
+                                <th>検索Vol</th>
+                                <th>担当</th>
                                 <th>サブカテゴリ</th>
                                 <th>遷移先(今あるもので)</th>
                                 <th>遷移先(理想)</th>
@@ -101,18 +185,8 @@
                                 <th>オファーページ遷移率</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr><td>1</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/10071/" class="link-url">https://service.plan-b.co.jp/blog/seo/10071/</a></td><td>GoogleSearchConsole 検索アナリティクスの活用術｜こう見ればあなたも使いこなせる | PINTO! by PLAN-B</td><td>Google Search Console</td><td>40500</td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>11</td><td>1</td><td>9.09%</td></tr>
-                            <tr><td>20</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/11503/" class="link-url">https://service.plan-b.co.jp/blog/seo/11503/</a></td><td>アナリティクスのコンバージョン設定｜通常サイト・ECサイト・クロスドメイントラッキングも解説 | PINTO! by PLAN-B</td><td>クロスドメイントラッキング</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td>SW</td><td></td><td></td><td></td><td>455</td><td>31</td><td>6.81%</td></tr>
-                            <tr><td>21</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/11504/" class="link-url">https://service.plan-b.co.jp/blog/seo/11504/</a></td><td>GoogleアナリティクスのIP除外設定｜自分のアクセスを取得しないために必須 | PINTO! by PLAN-B</td><td>アナリティクス ip 除外</td><td>260</td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>1271</td><td>97</td><td>7.63%</td></tr>
-                            <tr><td>22</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/11505/" class="link-url">https://service.plan-b.co.jp/blog/seo/11505/</a></td><td>Googleアナリティクスイベントトラッキング｜設定方法から注意点・おすすめのプラグイン紹介 | PINTO! by PLAN-B</td><td>アナリティクス イベント 設定</td><td>90</td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td>SW</td><td></td><td></td><td></td><td>101</td><td>9</td><td>8.91%</td></tr>
-                            <tr><td>36</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12781/" class="link-url">https://service.plan-b.co.jp/blog/seo/12781/</a></td><td>Googleアナリティクスでの検索ワードチェック方法｜not providedの理由も解説 | PINTO! by PLAN-B</td><td>アナリティクス 検索ワード</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE※最適化CTA設置</td><td>SW</td><td></td><td></td><td></td><td>1666</td><td>106</td><td>6.36%</td></tr>
-                            <tr><td>37</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12792/" class="link-url">https://service.plan-b.co.jp/blog/seo/12792/</a></td><td>Googleアナリティクス資格一覧｜運用者なら取るべき？内容と業界の認知度などを紹介 | PINTO! by PLAN-B</td><td>googleアナリティクス 資格</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>666</td><td>57</td><td>8.56%</td></tr>
-                            <tr><td>38</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12837/" class="link-url">https://service.plan-b.co.jp/blog/seo/12837/</a></td><td>Googleアナリティクス カスタムディメンション｜おすすめの設定方法と運用の考え方について | PINTO! by PLAN-B</td><td>カスタムディメンション</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>22</td><td>1</td><td>4.55%</td></tr>
-                            <tr><td>39</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/12847/" class="link-url">https://service.plan-b.co.jp/blog/seo/12847/</a></td><td>Googleアナリティクスの勉強方法一覧｜効率的な学習で最大の成果を出す | PINTO! by PLAN-B</td><td>Googleアナリティクス 勉強</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td></td><td>221</td><td>18</td><td>8.14%</td></tr>
-                            <tr><td>47</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/13280/" class="link-url">https://service.plan-b.co.jp/blog/seo/13280/</a></td><td>Googleアナリティクスのレポート作成ツール｜無料で使えるレポート作成ツール一覧 | PINTO! by PLAN-B</td><td>アナリティクスレポート</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td></td><td></td><td></td><td>96</td><td>7</td><td>7.29%</td></tr>
-                            <tr><td>50</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/13519/" class="link-url">https://service.plan-b.co.jp/blog/seo/13519/</a></td><td>Googleアナリティクスゴールフロー設定｜便利な機能を覚えてマーケティングで活用しよう！ | PINTO! by PLAN-B</td><td></td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>GAGSC</td><td></td><td></td><td></td><td>16</td><td></td><td>0.00%</td></tr>
-                            <tr><td>51</td><td></td><td><a href="https://service.plan-b.co.jp/blog/seo/13520/" class="link-url">https://service.plan-b.co.jp/blog/seo/13520/</a></td><td>アシストコンバージョン｜レポートのチェック方法と運用の際の注意点を紹介します | PINTO! by PLAN-B</td><td>アシストコンバージョン</td><td></td><td>GAGSC</td><td></td><td>成果観測</td><td></td><td></td><td></td><td></td><td>SEARCH WRITE</td><td></td><td></td><td></td><td>98</td><td>10</td><td>10.20%</td></tr>
+                        <tbody id="article-table-body">
+                            <!-- カテゴリごとにグループ化し、トグルボタンを設置 -->
                         </tbody>
                     </table>
                 </div>
