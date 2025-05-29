@@ -8,12 +8,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     function showPage(page) {
         document.getElementById('page-article').style.display = (page === 'article') ? 'block' : 'none';
         document.getElementById('page-genre').style.display = (page === 'genre') ? 'block' : 'none';
         document.getElementById('page-persona').style.display = (page === 'persona') ? 'block' : 'none';
         document.getElementById('page-persona-chat').style.display = (page === 'persona-chat') ? 'block' : 'none';
+        document.getElementById('page-basic-info').style.display = (page === 'basic-info') ? 'block' : 'none';
+        document.getElementById('page-kw-dashboard').style.display = (page === 'kw-dashboard') ? 'block' : 'none';
         document.querySelectorAll('.sidebar-menu li').forEach(function(li) {
             li.classList.remove('active');
         });
@@ -22,7 +25,14 @@
             (page === 'article') ? '成果チェック' :
             (page === 'genre') ? '記事ジャンル集計' :
             (page === 'persona') ? 'ペルソナ・カスタマージャーニー生成' :
+            (page === 'basic-info') ? '基礎情報入力' :
+            (page === 'kw-dashboard') ? 'KW状況ダッシュボード' :
             'ペルソナ対話';
+        if(page === 'kw-dashboard') {
+            renderKwStatusChart();
+            renderKwTable();
+            renderTaskTable();
+        }
     }
     window.onload = function() {
         showPage('article');
@@ -117,6 +127,84 @@
       });
       btn.textContent = isOpen ? '▲' : '▼';
     }
+    // 仮データ（PLAN-B公式ブログ参考）
+    const kwStatusPercent = 80;
+    const kwTableData = [
+      { keyword: 'SEO対策', url: 'https://www.plan-b.co.jp/blog/seo/', rank: 2, inflow: 1800, imp: 12000, ctr: '15%', cv: '高' },
+      { keyword: 'Web広告', url: 'https://www.plan-b.co.jp/blog/web-ad/', rank: 5, inflow: 1200, imp: 9000, ctr: '13%', cv: '高' },
+      { keyword: 'SNSマーケティング', url: 'https://www.plan-b.co.jp/blog/sns-marketing/', rank: 7, inflow: 950, imp: 8000, ctr: '12%', cv: '中' },
+      { keyword: 'コンテンツマーケティング', url: 'https://www.plan-b.co.jp/blog/seo/10071/', rank: 10, inflow: 700, imp: 6000, ctr: '11%', cv: '中' },
+      { keyword: 'Google広告', url: 'https://www.plan-b.co.jp/blog/web-ad/11503/', rank: 12, inflow: 600, imp: 5000, ctr: '10%', cv: '中' },
+      { keyword: 'インフルエンサーマーケ', url: 'https://www.plan-b.co.jp/blog/sns-marketing/30001/', rank: 15, inflow: 400, imp: 3500, ctr: '9%', cv: '低' },
+      { keyword: 'SEO記事制作', url: 'https://www.plan-b.co.jp/blog/seo/11504/', rank: 8, inflow: 800, imp: 7000, ctr: '11%', cv: '中' },
+      { keyword: 'オウンドメディア運用', url: 'https://www.plan-b.co.jp/blog/seo/12837/', rank: 20, inflow: 300, imp: 2500, ctr: '8%', cv: '低' },
+      { keyword: 'Webサイト制作', url: 'https://www.plan-b.co.jp/blog/web-create/', rank: 6, inflow: 1000, imp: 8500, ctr: '12%', cv: '高' },
+      { keyword: 'GA4', url: 'https://www.plan-b.co.jp/blog/seo/13280/', rank: 18, inflow: 350, imp: 3000, ctr: '9%', cv: '低' }
+    ];
+    const taskTableData = [
+      { url: 'https://www.plan-b.co.jp/blog/seo/', type: 'コンテンツ', detail: 'SEO対策記事の最新アルゴリズム情報追加' },
+      { url: 'https://www.plan-b.co.jp/blog/web-ad/', type: '内部', detail: 'Web広告カテゴリの内部リンク最適化' },
+      { url: 'https://www.plan-b.co.jp/blog/sns-marketing/', type: '外部', detail: 'SNSマーケティング記事への外部被リンク獲得施策' },
+      { url: 'https://www.plan-b.co.jp/blog/seo/10071/', type: 'コンテンツ', detail: 'コンテンツマーケティング記事の事例追加' },
+      { url: 'https://www.plan-b.co.jp/blog/web-ad/11503/', type: 'コンテンツ', detail: 'Google広告記事の最新入札戦略解説追加' },
+      { url: 'https://www.plan-b.co.jp/blog/sns-marketing/30001/', type: '内部', detail: 'インフルエンサーマーケ記事の構造化データマークアップ' },
+      { url: 'https://www.plan-b.co.jp/blog/seo/11504/', type: '外部', detail: 'SEO記事制作記事の外部メディア掲載依頼' },
+      { url: 'https://www.plan-b.co.jp/blog/seo/12837/', type: 'コンテンツ', detail: 'オウンドメディア運用記事の成功事例追加' },
+      { url: 'https://www.plan-b.co.jp/blog/web-create/', type: '内部', detail: 'Webサイト制作カテゴリのパンくずリスト最適化' },
+      { url: 'https://www.plan-b.co.jp/blog/seo/13280/', type: 'コンテンツ', detail: 'GA4記事の最新UI変更点・活用事例追加' }
+    ];
+
+    function renderKwTable() {
+      const tbody = document.getElementById('kw-table-body');
+      tbody.innerHTML = '';
+      kwTableData.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.keyword}</td>
+          <td><a href="${row.url}" target="_blank">${row.url}</a></td>
+          <td>${row.rank}</td>
+          <td>${row.inflow}</td>
+          <td>${row.imp}</td>
+          <td>${row.ctr}</td>
+          <td>${row.cv}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    function renderTaskTable() {
+      const tbody = document.getElementById('task-table-body');
+      tbody.innerHTML = '';
+      taskTableData.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><a href="${row.url}" target="_blank">${row.url}</a></td>
+          <td>${row.type}</td>
+          <td>${row.detail}</td>
+          <td><button class="task-exec-btn" onclick="alert('タスクを実行します（ダミー）')">実行</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    function renderKwStatusChart() {
+      const ctx = document.getElementById('kwStatusChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [kwStatusPercent, 100 - kwStatusPercent],
+            backgroundColor: ['#6c8ebf', '#eaf4fb'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          cutout: '70%',
+          plugins: { legend: { display: false } },
+          tooltips: { enabled: false },
+          responsive: false
+        }
+      });
+      document.getElementById('kw-status-rate').textContent = kwStatusPercent + '%';
+    }
     </script>
 </head>
 <body>
@@ -130,6 +218,8 @@
             <li id="menu-genre" onclick="showPage('genre')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事ジャンル集計</li>
             <li id="menu-persona" onclick="showPage('persona')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ・カスタマージャーニー生成</li>
             <li id="menu-persona-chat" onclick="showPage('persona-chat')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ対話</li>
+            <li id="menu-basic-info" onclick="showPage('basic-info')"><span class="icon"><img src="design/Icon.png" alt=""></span>基礎情報入力</li>
+            <li id="menu-kw-dashboard" onclick="showPage('kw-dashboard')"><span class="icon"><img src="design/Icon.png" alt=""></span>KW状況ダッシュボード</li>
         </ul>
         <div class="sidebar-bottom">
             <div class="sidebar-user">user@example.com</div>
@@ -354,6 +444,90 @@
                     </div>
                 </div>
             </div>
+            <div id="page-basic-info" class="dashboard-page" style="display:none;">
+                <div class="basic-info-form-container">
+                    <h2 class="form-title">基礎情報入力</h2>
+                    <form class="basic-info-form" onsubmit="event.preventDefault(); alert('送信しました！（ダミー）');">
+                        <div class="form-group">
+                            <label for="service-desc">サービス内容（どんなものを、誰に提供するのか）</label>
+                            <textarea id="service-desc" class="form-input" rows="2" placeholder="例：中小企業向けにSEOコンサルティングを提供"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="media-goal">メディア運営のゴール（定性/定量）</label>
+                            <textarea id="media-goal" class="form-input" rows="2" placeholder="例：月間10万PV達成、リード獲得数の増加など"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="target">ターゲット</label>
+                            <input id="target" class="form-input" type="text" placeholder="例：BtoBマーケ担当者、経営者など">
+                        </div>
+                        <div class="form-group">
+                            <label for="persona-img">ペルソナイメージ（あれば）</label>
+                            <input id="persona-img" class="form-input" type="text" placeholder="例：35歳女性、都内在住、マーケター">
+                        </div>
+                        <div class="form-group">
+                            <label for="main-kw">メインKWの候補</label>
+                            <input id="main-kw" class="form-input" type="text" placeholder="例：SEO対策、コンテンツマーケティングなど">
+                        </div>
+                        <div class="form-group">
+                            <label for="file-upload">関連資料アップロード（任意）</label>
+                            <input id="file-upload" class="form-input" type="file">
+                        </div>
+                        <div class="form-group form-btn-row">
+                            <button type="submit" class="form-next-btn">次へ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="page-kw-dashboard" class="dashboard-page" style="display:none;">
+                <div class="kw-dashboard-container">
+                    <div class="kw-dashboard-left">
+                        <div class="kw-status-header">
+                            <div>
+                                <h2 class="kw-section-title">KW状況</h2>
+                                <div class="kw-status-desc">主要キーワードの獲得状況を理想値と比較しています。</div>
+                            </div>
+                            <div class="kw-status-chart-area">
+                                <canvas id="kwStatusChart" width="100" height="100"></canvas>
+                                <div class="kw-status-rate" id="kw-status-rate">80%</div>
+                            </div>
+                        </div>
+                        <div class="kw-table-area">
+                            <table class="kw-table">
+                                <thead>
+                                    <tr>
+                                        <th>キーワード</th>
+                                        <th>対応URL</th>
+                                        <th>現在の順位</th>
+                                        <th>流入数/月</th>
+                                        <th>表示回数/月</th>
+                                        <th>クリック率/月</th>
+                                        <th>CV貢献度</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kw-table-body">
+                                    <!-- 仮データでJS描画 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="kw-dashboard-right">
+                        <h2 class="kw-section-title">優先度の高いタスク</h2>
+                        <table class="task-table">
+                            <thead>
+                                <tr>
+                                    <th>URL</th>
+                                    <th>タスク種別</th>
+                                    <th>タスク内容</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="task-table-body">
+                                <!-- 仮データでJS描画 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
     <style>
@@ -455,6 +629,183 @@
         transition: background 0.2s;
     }
     .chat-send-btn:hover {
+        background: #4a6fa1;
+    }
+    .basic-info-form-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 36px 32px 28px 32px;
+        max-width: 520px;
+        margin: 40px auto;
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+    .form-title {
+        font-size: 22px;
+        color: #2a4d6c;
+        font-weight: 700;
+        margin-bottom: 28px;
+        letter-spacing: 0.02em;
+    }
+    .basic-info-form .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    .basic-info-form label {
+        font-size: 15px;
+        color: #6c8ebf;
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+    .form-input {
+        font-size: 15px;
+        border: 1px solid #cfd8dc;
+        border-radius: 8px;
+        padding: 8px 12px;
+        background: #f8fafc;
+        outline: none;
+        transition: border 0.2s;
+    }
+    .form-input:focus {
+        border: 1.5px solid #6c8ebf;
+        background: #fff;
+    }
+    .form-btn-row {
+        text-align: right;
+    }
+    .form-next-btn {
+        background: #6c8ebf;
+        color: #fff;
+        border: none;
+        border-radius: 18px;
+        padding: 10px 32px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 8px;
+    }
+    .form-next-btn:hover {
+        background: #4a6fa1;
+    }
+    .kw-dashboard-container {
+        display: flex;
+        gap: 32px;
+        max-width: 1200px;
+        margin: 40px auto;
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+    .kw-dashboard-left {
+        flex: 7;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 28px 28px 24px 28px;
+        min-width: 0;
+    }
+    .kw-dashboard-right {
+        flex: 3;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 28px 20px 24px 20px;
+        min-width: 260px;
+    }
+    .kw-section-title {
+        font-size: 20px;
+        color: #2a4d6c;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .kw-status-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+    .kw-status-desc {
+        color: #6c8ebf;
+        font-size: 15px;
+        margin-bottom: 0;
+    }
+    .kw-status-chart-area {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+    #kwStatusChart {
+        width: 100px;
+        height: 100px;
+    }
+    .kw-status-rate {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 22px;
+        font-weight: 700;
+        color: #4a6fa1;
+        pointer-events: none;
+    }
+    .kw-table-area {
+        margin-top: 18px;
+        overflow-x: auto;
+    }
+    .kw-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+        background: #f8fafc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .kw-table th, .kw-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e0e7ef;
+        text-align: left;
+    }
+    .kw-table th {
+        background: #eaf4fb;
+        color: #2a4d6c;
+        font-weight: 600;
+    }
+    .kw-table tr:last-child td {
+        border-bottom: none;
+    }
+    .task-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+        background: #f8fafc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .task-table th, .task-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e0e7ef;
+        text-align: left;
+    }
+    .task-table th {
+        background: #eaf4fb;
+        color: #2a4d6c;
+        font-weight: 600;
+    }
+    .task-table tr:last-child td {
+        border-bottom: none;
+    }
+    .task-exec-btn {
+        background: #6c8ebf;
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        padding: 6px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .task-exec-btn:hover {
         background: #4a6fa1;
     }
     </style>
