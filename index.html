@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff2html/3.4.7/diff2html.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/diff2html/3.4.7/diff2html.min.css" />
     <script>
     function showPage(page) {
         document.getElementById('page-article').style.display = (page === 'article') ? 'block' : 'none';
@@ -22,7 +25,7 @@
         });
         document.getElementById('menu-' + page).classList.add('active');
         document.getElementById('breadcrumb-title').textContent =
-            (page === 'article') ? '成果チェック' :
+            (page === 'article') ? '記事一覧' :
             (page === 'genre') ? '記事ジャンル集計' :
             (page === 'persona') ? 'ペルソナ・カスタマージャーニー生成' :
             (page === 'basic-info') ? '基礎情報入力' :
@@ -175,12 +178,18 @@
       const tbody = document.getElementById('task-table-body');
       tbody.innerHTML = '';
       taskTableData.forEach((row, idx) => {
+        let execBtn = '';
+        if(row.type === 'コンテンツ') {
+          execBtn = `<button class="task-exec-btn" onclick="showContentDiff(${idx})">実行</button>`;
+        } else {
+          execBtn = `<button class="task-exec-btn" onclick="alert('タスクを実行します（ダミー）')">実行</button>`;
+        }
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><a href="${row.url}" target="_blank">${row.url}</a></td>
           <td>${row.type}</td>
           <td>${row.detail}</td>
-          <td><button class="task-exec-btn" onclick="alert('タスクを実行します（ダミー）')">実行</button></td>
+          <td>${execBtn}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -214,7 +223,7 @@
             <img src="design/Logo.png" alt="Logo" class="sidebar-logo">
         </div>
         <ul class="sidebar-menu">
-            <li id="menu-article" class="active" onclick="showPage('article')"><span class="icon"><img src="design/Icon.png" alt=""></span>成果チェック</li>
+            <li id="menu-article" class="active" onclick="showPage('article')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事一覧</li>
             <li id="menu-genre" onclick="showPage('genre')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事ジャンル集計</li>
             <li id="menu-persona" onclick="showPage('persona')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ・カスタマージャーニー生成</li>
             <li id="menu-persona-chat" onclick="showPage('persona-chat')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ対話</li>
@@ -231,7 +240,7 @@
             <nav class="breadcrumbs">
                 <ul>
                     <li><a href="#">ホーム</a></li>
-                    <li id="breadcrumb-title">成果チェック</li>
+                    <li id="breadcrumb-title">記事一覧</li>
                 </ul>
             </nav>
         </header>
@@ -447,7 +456,7 @@
             <div id="page-basic-info" class="dashboard-page" style="display:none;">
                 <div class="basic-info-form-container">
                     <h2 class="form-title">基礎情報入力</h2>
-                    <form class="basic-info-form" onsubmit="event.preventDefault(); alert('送信しました！（ダミー）');">
+                    <form class="basic-info-form" onsubmit="event.preventDefault(); showPage('kw-dashboard');">
                         <div class="form-group">
                             <label for="service-desc">サービス内容（どんなものを、誰に提供するのか）</label>
                             <textarea id="service-desc" class="form-input" rows="2" placeholder="例：中小企業向けにSEOコンサルティングを提供"></textarea>
@@ -505,7 +514,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="kw-table-body">
-                                    <!-- 仮データでJS描画 -->
+                                    <!-- カテゴリごとにグループ化し、トグルボタンを設置（JSで描画） -->
                                 </tbody>
                             </table>
                         </div>
@@ -526,6 +535,27 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+            <div id="page-content-diff" class="dashboard-page" style="display:none;">
+                <div class="content-diff-container">
+                    <div class="content-diff-header">
+                        <button class="diff-nav-btn" onclick="alert('前へ（ダミー）')">前へ</button>
+                        <span class="diff-title">コンテンツ変更前・変更後の比較</span>
+                        <button class="diff-nav-btn" onclick="alert('次へ（ダミー）')">次へ</button>
+                        <button class="diff-restore-btn" onclick="alert('このバージョンを復元します（ダミー）')">このバージョンを復元</button>
+                    </div>
+                    <div class="content-diff-body">
+                        <div class="diff-col">
+                            <div class="diff-col-title">変更前</div>
+                            <pre id="diff-before" class="diff-pre"></pre>
+                        </div>
+                        <div class="diff-col">
+                            <div class="diff-col-title">変更後</div>
+                            <pre id="diff-after" class="diff-pre"></pre>
+                        </div>
+                    </div>
+                    <div class="diff-html-view" id="diff-html-view"></div>
                 </div>
             </div>
         </main>
@@ -808,6 +838,80 @@
     .task-exec-btn:hover {
         background: #4a6fa1;
     }
+    .content-diff-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 28px 24px 24px 24px;
+        max-width: 1100px;
+        margin: 40px auto;
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+    .content-diff-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+    .diff-title {
+        font-size: 18px;
+        color: #2a4d6c;
+        font-weight: 700;
+        flex: 1;
+        text-align: center;
+    }
+    .diff-nav-btn, .diff-restore-btn {
+        background: #6c8ebf;
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        padding: 6px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .diff-nav-btn:hover, .diff-restore-btn:hover {
+        background: #4a6fa1;
+    }
+    .diff-restore-btn {
+        margin-left: 16px;
+        background: #2a4d6c;
+    }
+    .content-diff-body {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 18px;
+    }
+    .diff-col {
+        flex: 1;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 12px 10px;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .diff-col-title {
+        font-size: 15px;
+        color: #6c8ebf;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .diff-pre {
+        font-size: 13px;
+        color: #333;
+        background: none;
+        border: none;
+        margin: 0;
+        padding: 0;
+        white-space: pre-wrap;
+        word-break: break-all;
+        flex: 1;
+    }
+    .diff-html-view {
+        margin-top: 12px;
+    }
     </style>
     <script>
     function sendPersonaChat() {
@@ -837,6 +941,33 @@
         if (msg.includes('コンテンツ')) return 'どんなコンテンツ案か、もう少し詳しく聞かせてください！';
         if (msg.includes('SEO')) return 'SEOの観点では、ユーザーの検索意図を意識した設計が大切だと思います。';
         return 'ありがとうございます！他にも質問があればどうぞ。';
+    }
+    // サンプルの変更前・変更後データ
+    const sampleBefore = `<table><tr><th>手法</th><th>費用相場</th></tr><tr><td>リード獲得</td><td>3万円〜/アポイント</td></tr><tr><td>SEO</td><td>5万円〜/月</td></tr></table>`;
+    const sampleAfter = `<table><tr><th>手法</th><th>費用相場</th></tr><tr><td>リード獲得</td><td>2.5万円〜/アポイント</td></tr><tr><td>SEO</td><td>3万円〜/月</td></tr></table>`;
+
+    // 差分比較画面に遷移し、差分を表示
+    function showContentDiff(idx) {
+        // サンプル：idxによって内容を切り替えてもOK。ここでは固定。
+        document.querySelectorAll('.dashboard-page').forEach(function(div) {
+            div.style.display = 'none';
+        });
+        document.getElementById('page-content-diff').style.display = 'block';
+        document.getElementById('breadcrumb-title').textContent = 'コンテンツ差分比較';
+        document.getElementById('diff-before').textContent = sampleBefore;
+        document.getElementById('diff-after').textContent = sampleAfter;
+        // 差分HTMLを生成
+        const dmp = new diff_match_patch();
+        const diff = dmp.diff_main(sampleBefore, sampleAfter);
+        dmp.diff_cleanupSemantic(diff);
+        let html = '';
+        diff.forEach(function(part) {
+            const op = part[0], text = part[1];
+            if(op === 1) html += '<span style="background:#d4f7d4;">' + text + '</span>'; // 追加（緑）
+            else if(op === -1) html += '<span style="background:#ffd6d6;">' + text + '</span>'; // 削除（赤）
+            else html += text;
+        });
+        document.getElementById('diff-html-view').innerHTML = '<div style="background:#f8fafc;padding:12px;border-radius:8px;">' + html + '</div>';
     }
     </script>
 </body>
