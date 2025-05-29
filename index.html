@@ -13,6 +13,7 @@
         document.getElementById('page-article').style.display = (page === 'article') ? 'block' : 'none';
         document.getElementById('page-genre').style.display = (page === 'genre') ? 'block' : 'none';
         document.getElementById('page-persona').style.display = (page === 'persona') ? 'block' : 'none';
+        document.getElementById('page-persona-chat').style.display = (page === 'persona-chat') ? 'block' : 'none';
         document.querySelectorAll('.sidebar-menu li').forEach(function(li) {
             li.classList.remove('active');
         });
@@ -20,7 +21,8 @@
         document.getElementById('breadcrumb-title').textContent =
             (page === 'article') ? '成果チェック' :
             (page === 'genre') ? '記事ジャンル集計' :
-            'ペルソナ・カスタマージャーニー生成';
+            (page === 'persona') ? 'ペルソナ・カスタマージャーニー生成' :
+            'ペルソナ対話';
     }
     window.onload = function() {
         showPage('article');
@@ -127,6 +129,7 @@
             <li id="menu-article" class="active" onclick="showPage('article')"><span class="icon"><img src="design/Icon.png" alt=""></span>成果チェック</li>
             <li id="menu-genre" onclick="showPage('genre')"><span class="icon"><img src="design/Icon.png" alt=""></span>記事ジャンル集計</li>
             <li id="menu-persona" onclick="showPage('persona')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ・カスタマージャーニー生成</li>
+            <li id="menu-persona-chat" onclick="showPage('persona-chat')"><span class="icon"><img src="design/Icon.png" alt=""></span>ペルソナ対話</li>
         </ul>
         <div class="sidebar-bottom">
             <div class="sidebar-user">user@example.com</div>
@@ -327,7 +330,163 @@
                     </div>
                 </div>
             </div>
+            <div id="page-persona-chat" class="dashboard-page" style="display:none;">
+                <div class="persona-chat-container">
+                    <div class="persona-profile-area">
+                        <div class="persona-image"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="ペルソナ画像"></div>
+                        <div class="persona-profile">
+                            <table>
+                                <tr><th>名前</th><td>山田 花子</td></tr>
+                                <tr><th>年齢</th><td>35歳</td></tr>
+                                <tr><th>職業</th><td>マーケター</td></tr>
+                                <tr><th>課題</th><td>SEO集客の強化</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="persona-chat-area">
+                        <div id="persona-chat-log" class="chat-log">
+                            <div class="chat-bubble persona-bubble">こんにちは！どんなキャンペーンやコンテンツについてご相談ですか？</div>
+                        </div>
+                        <div class="chat-input-row">
+                            <input type="text" id="persona-chat-input" class="chat-input" placeholder="ここにメッセージを入力...">
+                            <button onclick="sendPersonaChat()" class="chat-send-btn">送信</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
+    <style>
+    .persona-chat-container {
+        display: flex;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 32px 24px;
+        max-width: 900px;
+        margin: 32px auto;
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+    .persona-profile-area {
+        width: 260px;
+        border-right: 1px solid #eee;
+        padding-right: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .persona-image img {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e0e7ef;
+        margin-bottom: 16px;
+    }
+    .persona-profile table {
+        width: 100%;
+        font-size: 15px;
+        border-collapse: collapse;
+    }
+    .persona-profile th {
+        text-align: left;
+        color: #6c8ebf;
+        font-weight: 500;
+        padding: 4px 8px 4px 0;
+        width: 60px;
+    }
+    .persona-profile td {
+        padding: 4px 0;
+    }
+    .persona-chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding-left: 32px;
+    }
+    .chat-log {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 16px;
+        min-height: 240px;
+    }
+    .chat-bubble {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 18px;
+        margin-bottom: 10px;
+        max-width: 70%;
+        font-size: 15px;
+        line-height: 1.6;
+        word-break: break-word;
+    }
+    .persona-bubble {
+        background: #eaf4fb;
+        color: #2a4d6c;
+        align-self: flex-start;
+    }
+    .user-bubble {
+        background: #f5f5f5;
+        color: #333;
+        align-self: flex-end;
+        margin-left: auto;
+    }
+    .chat-input-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .chat-input {
+        flex: 1;
+        border: 1px solid #cfd8dc;
+        border-radius: 18px;
+        padding: 8px 16px;
+        font-size: 15px;
+        outline: none;
+    }
+    .chat-send-btn {
+        background: #6c8ebf;
+        color: #fff;
+        border: none;
+        border-radius: 18px;
+        padding: 8px 20px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .chat-send-btn:hover {
+        background: #4a6fa1;
+    }
+    </style>
+    <script>
+    function sendPersonaChat() {
+        var input = document.getElementById('persona-chat-input');
+        var log = document.getElementById('persona-chat-log');
+        var msg = input.value.trim();
+        if (!msg) return;
+        // ユーザーの吹き出し追加
+        var userDiv = document.createElement('div');
+        userDiv.className = 'chat-bubble user-bubble';
+        userDiv.textContent = msg;
+        log.appendChild(userDiv);
+        input.value = '';
+        // ペルソナの仮応答（1秒後）
+        setTimeout(function() {
+            var personaDiv = document.createElement('div');
+            personaDiv.className = 'chat-bubble persona-bubble';
+            personaDiv.textContent = getPersonaReply(msg);
+            log.appendChild(personaDiv);
+            log.scrollTop = log.scrollHeight;
+        }, 1000);
+        log.scrollTop = log.scrollHeight;
+    }
+    function getPersonaReply(msg) {
+        // 仮の自動応答ロジック
+        if (msg.includes('キャンペーン')) return 'そのキャンペーンのターゲットや目的をもう少し教えてもらえますか？';
+        if (msg.includes('コンテンツ')) return 'どんなコンテンツ案か、もう少し詳しく聞かせてください！';
+        if (msg.includes('SEO')) return 'SEOの観点では、ユーザーの検索意図を意識した設計が大切だと思います。';
+        return 'ありがとうございます！他にも質問があればどうぞ。';
+    }
+    </script>
 </body>
 </html> 
